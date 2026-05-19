@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "mongodb-healthpay": {
+      "command": "npx",
+      "args": ["-y", "mongodb-mcp-server", "--readOnly"],
+      "env": {
+        "MDB_MCP_CONNECTION_STRING": "mongodb+srv://USER:PASS@cluster.mongodb.net/healthpay"
+      },
+      "description": "Official MongoDB MCP Server — read-only access to HealthPay Atlas cluster",
+      "tools": [
+        "find",
+        "aggregate",
+        "listCollections",
+        "listDatabases",
+        "count",
+        "distinct"
+      ]
+    }
+  }
+}

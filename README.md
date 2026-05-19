@@ -105,3 +105,77 @@ Platform: https://rapid-agent.devpost.com/
 ### License
 
 This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## MongoDB MCP Server Integration
+
+HealthPay supports the **official `mongodb-mcp-server`** npm package, allowing judges and
+evaluators to connect directly to our Atlas cluster using any MCP-compatible client.
+
+### Quick Connect (Claude Desktop / Gemini CLI)
+
+**Step 1 — Install Node.js 18+** (if not already installed)
+
+**Step 2 — Set the connection string**
+```bash
+export MDB_MCP_CONNECTION_STRING="mongodb+srv://USER:PASS@cluster.mongodb.net/healthpay"
+```
+
+**Step 3 — Run the official MCP server**
+```bash
+npx -y mongodb-mcp-server --readOnly
+```
+
+That's it. The server exposes `find`, `aggregate`, `listCollections`, `count`, and more —
+all pointing at the live `healthpay` database.
+
+### Claude Desktop Configuration
+
+Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "mongodb-healthpay": {
+      "command": "npx",
+      "args": ["-y", "mongodb-mcp-server", "--readOnly"],
+      "env": {
+        "MDB_MCP_CONNECTION_STRING": "mongodb+srv://USER:PASS@cluster.mongodb.net/healthpay"
+      }
+    }
+  }
+}
+```
+
+### Gemini CLI Configuration
+
+```bash
+export MDB_MCP_CONNECTION_STRING="mongodb+srv://USER:PASS@cluster.mongodb.net/healthpay"
+gemini --mcp-config mcp-config/gemini-cli-config.json
+```
+
+### HealthPay Collections
+
+| Collection | Contents |
+|------------|----------|
+| `claims` | FHIR R4 ClaimResponse documents |
+| `eobs` | FHIR R4 ExplanationOfBenefit documents |
+| `patients` | FHIR R4 Patient demographics |
+
+### Dual-Layer MCP Architecture
+
+| Layer | Server | Tools | Use Case |
+|-------|--------|-------|----------|
+| **Official** | `mongodb-mcp-server` (npm) | `find`, `aggregate`, `listCollections`, … | Raw data exploration, judge verification |
+| **Custom** | `src/mcp_server.py` | `reconcile_claims`, `analyze_denials`, `get_financial_vitals`, `predict_payment_risk`, `suggest_coding_optimization` | Full RCM workflow automation |
+
+Both layers connect to the same MongoDB Atlas cluster. See `mcp-config/` for ready-to-use
+configuration files.
+
+### Compatibility Demo
+
+```bash
+# Verify official MCP Server compatibility (mock mode, no DB needed)
+python src/mongodb_mcp_bridge.py
+```

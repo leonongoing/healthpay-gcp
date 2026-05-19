@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "mongodb-healthpay": {
+      "command": "npx",
+      "args": ["-y", "mongodb-mcp-server", "--readOnly"],
+      "env": {
+        "MDB_MCP_CONNECTION_STRING": "mongodb+srv://USER:PASS@cluster.mongodb.net/healthpay"
+      }
+    }
+  }
+}

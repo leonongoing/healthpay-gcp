@@ -65,6 +65,15 @@ The Model Context Protocol provides a clean, standardized interface between the 
 **Mock Mode for Reliable Demo**
 We designed a mock/real mode split from day one. Without `MONGODB_URI` set, all data operations return realistic synthetic data. This means the agent can be demoed, tested, and evaluated without any cloud credentials.
 
+**Official MongoDB MCP Server — Dual-Layer Architecture**
+Beyond our custom 5-tool MCP server, HealthPay integrates the **official `mongodb-mcp-server`** npm package as a second access layer. This dual-layer architecture gives evaluators two complementary ways to interact with our data:
+
+1. **Custom HealthPay MCP Server** (`src/mcp_server.py`) — 5 domain-specific tools with built-in FHIR logic, CARC/RARC denial classification, risk scoring, and coding optimization. This is the high-level interface designed for clinic billing workflows.
+
+2. **Official MongoDB MCP Server** (`npx -y mongodb-mcp-server --readOnly`) — generic `find`, `aggregate`, `listCollections`, and `count` tools that expose the raw `healthpay` database directly. Judges can connect any MCP-compatible client (Claude Desktop, Gemini CLI) and query our Atlas cluster without any custom code.
+
+Both layers connect to the same MongoDB Atlas cluster (`claims`, `eobs`, `patients` collections). The official server proves our data model is standards-compliant and accessible to any MCP client; the custom server proves we can build domain intelligence on top of it. See `mcp-config/` for ready-to-use configuration files and `src/mongodb_mcp_bridge.py` for a runnable compatibility demo.
+
 ---
 
 ## Challenges
